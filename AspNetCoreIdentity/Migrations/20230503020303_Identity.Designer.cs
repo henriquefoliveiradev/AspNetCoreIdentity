@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AspNetCoreIdentity.Migrations
 {
     [DbContext(typeof(AspNetCoreIdentityContext))]
-    [Migration("20230421035437_Identity")]
+    [Migration("20230503020303_Identity")]
     partial class Identity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -25,6 +25,7 @@ builder.Services.AddDbContext<AspNetCoreIdentityContext>(options =>
 
 // Adicionando configuração padrão do Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AspNetCoreIdentityContext>();
 
 // Adicionando Autorizações personalizadas por policies
@@ -32,8 +33,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 //{
 //    options.AddPolicy("PodeExcluir", policy => policy.RequireClaim("PodeExcluir"));
 
-//    options.AddPolicy("PodeLer", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeLer")));
-//    options.AddPolicy("PodeEscrever", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeEscrever")));
+//    //options.AddPolicy("PodeLer", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeLer")));
+//    //options.AddPolicy("PodeEscrever", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeEscrever")));
 //});
 
 // Adicionando MVC no pipeline
