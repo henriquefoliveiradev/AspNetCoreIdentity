@@ -1,4 +1,6 @@
 using AspNetCoreIdentity.Data;
+using AspNetCoreIdentity.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,13 +31,15 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<AspNetCoreIdentityContext>();
 
 // Adicionando Autorizações personalizadas por policies
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("PodeExcluir", policy => policy.RequireClaim("PodeExcluir"));
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PodeExcluir", policy => policy.RequireClaim("PodeExcluir"));
 
-//    //options.AddPolicy("PodeLer", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeLer")));
-//    //options.AddPolicy("PodeEscrever", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeEscrever")));
-//});
+    options.AddPolicy("PodeLer", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeLer")));
+    options.AddPolicy("PodeEscrever", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeEscrever")));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, PermissaoNecessariaHandler>();
 
 // Adicionando MVC no pipeline
 builder.Services.AddControllersWithViews();
