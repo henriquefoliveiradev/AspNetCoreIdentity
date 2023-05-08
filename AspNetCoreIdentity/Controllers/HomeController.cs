@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using AspNetCoreIdentity.Extensions;
 
 namespace AspNetCoreIdentity.Controllers
 {
@@ -35,7 +36,7 @@ namespace AspNetCoreIdentity.Controllers
         }
 
 
-        [Authorize(Policy = "PodeEscrever")]
+        [ClaimsAuthorize("Permissao", "PodeEscrsever")]
         public IActionResult SecretClaimEscrever()
         {
             return View("Secret");
