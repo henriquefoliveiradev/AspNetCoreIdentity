@@ -1,3 +1,4 @@
+using AspNetCoreIdentity.Config;
 using AspNetCoreIdentity.Data;
 using AspNetCoreIdentity.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -13,33 +14,8 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 // *** Configurando serviços no container ***
-
-// Politica de cookies (LGPD)
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.CheckConsentNeeded = context => true;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-});
-
-// Adicionando suporte ao contexto do Identity via EF
-builder.Services.AddDbContext<AspNetCoreIdentityContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AspNetCoreIdentityContextConnection")));
-
-// Adicionando configuração padrão do Identity
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AspNetCoreIdentityContext>();
-
-// Adicionando Autorizações personalizadas por policies
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("PodeExcluir", policy => policy.RequireClaim("PodeExcluir"));
-
-    options.AddPolicy("PodeLer", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeLer")));
-    options.AddPolicy("PodeEscrever", policy => policy.Requirements.Add(new PermissaoNecessaria("PodeEscrever")));
-});
-
-builder.Services.AddSingleton<IAuthorizationHandler, PermissaoNecessariaHandler>();
+builder.Services.ConfigureIdentity(builder.Configuration);
+builder.Services.ResolveDependencies();
 
 // Adicionando MVC no pipeline
 builder.Services.AddControllersWithViews();
