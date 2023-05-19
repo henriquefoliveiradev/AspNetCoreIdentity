@@ -19,7 +19,7 @@ namespace AspNetCoreIdentity.Extensions
         {
             if (context.HttpContext.User.Identity.IsAuthenticated)
             {
-                var message = context.HttpContext.User.Identity.Name + " Acesso: " +
+                var message = context.HttpContext.User.Identity.Name + " Acessou: " +
                               context.HttpContext.Request.GetDisplayUrl();
 
                 _logger.Info(message);
