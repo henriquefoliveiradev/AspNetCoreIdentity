@@ -1,12 +1,12 @@
 using AspNetCoreIdentity.Config;
-using AspNetCoreIdentity.Data;
-using AspNetCoreIdentity.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using KissLog.AspNetCore;
+using KissLog.CloudListeners.Auth;
+using KissLog.CloudListeners.RequestLogsListener;
+using KissLog.Formatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Configurando para definir o appsettings automaticamente
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile("appsettings.json", true, true)
@@ -55,5 +55,15 @@ app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 
 // Mapeando componentes Razor Pages (ex: Identity)
 app.MapRazorPages();
+
+app.UseKissLogMiddleware(options => {
+    options.Listeners.Add(new RequestLogsApiListener(new Application(
+        builder.Configuration["KissLog.OrganizationId"],
+        builder.Configuration["KissLog.ApplicationId"])
+        )
+    {
+        ApiUrl = builder.Configuration["KissLog.ApiUrl"]
+    });
+});
 
 app.Run();
