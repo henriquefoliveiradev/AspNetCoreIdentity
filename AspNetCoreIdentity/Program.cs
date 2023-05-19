@@ -1,31 +1,45 @@
 using AspNetCoreIdentity.Config;
-using KissLog.AspNetCore;
-using KissLog.CloudListeners.Auth;
-using KissLog.CloudListeners.RequestLogsListener;
-using KissLog.Formatters;
+using AspNetCoreIdentity.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Configurando para definir o appsettings automaticamente
+// Adicionando suporte a Diversos arquivos de configuração por ambiente.
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile("appsettings.json", true, true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
     .AddEnvironmentVariables();
 
+// Adicionando suporte a User Secrets
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 // *** Configurando serviços no container ***
-builder.Services.ConfigureIdentity(builder.Configuration);
+
+// Extension Method de configuração do Identity
+builder.Services.AddIdentityConfig(builder.Configuration);
+
+// Extension Method de resolução de DI
 builder.Services.ResolveDependencies();
 
-// Adicionando MVC no pipeline
-builder.Services.AddControllersWithViews();
+// Extension Method de configuração KissLog
+builder.Services.RegisterKissLogListeners();
 
-// Adicionando suporte a componentes Razor (ex. Telas do Identity)
+// Adicionando o MVC com suporte ao filtro de auditoria
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(typeof(AuditoriaFilter));
+});
+
+// Adicionando suporte a componentes Razor (ex: Telas do Identity)
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// *** Configurando o resquest dos serviços no pipeline *** 
+// *** Configurando o resquest dos serviços no pipeline ***
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -37,10 +51,10 @@ else
     app.UseHsts();
 }
 
-// Redirecionamento para HTTPs
+// Força redirect para HTTPS
 app.UseHttpsRedirection();
 
-// Uso de arquivos estáticos (ex. CSS, JS)
+// Adicionando suporte a arquivos (ex: CSS, JS)
 app.UseStaticFiles();
 
 // Adicionando suporte a rota
@@ -56,14 +70,7 @@ app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 // Mapeando componentes Razor Pages (ex: Identity)
 app.MapRazorPages();
 
-app.UseKissLogMiddleware(options => {
-    options.Listeners.Add(new RequestLogsApiListener(new Application(
-        builder.Configuration["KissLog.OrganizationId"],
-        builder.Configuration["KissLog.ApplicationId"])
-        )
-    {
-        ApiUrl = builder.Configuration["KissLog.ApiUrl"]
-    });
-});
+// Adicionando suporte ao KissLog
+app.RegisterKissLogListeners(builder.Configuration);
 
 app.Run();

@@ -7,7 +7,7 @@ namespace AspNetCoreIdentity.Config
 {
     public static class IdentityConfig
     {
-        public static IServiceCollection ConfigureIdentity(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddIdentityConfig(this IServiceCollection services, IConfiguration configuration)
         {
             // Adicionando Autorizações personalizadas por policies
             services.AddAuthorization(options =>
